@@ -6,7 +6,7 @@ import { lookup, newId, taka } from "@/lib/demo/logic";
 import { useDemo } from "@/lib/demo/store";
 import type { DemoDb, Scholarship } from "@/lib/demo/types";
 import { DemoLoading, DemoNotice, Toolbar } from "@/components/demo";
-import { Badge, Button, Card, EmptyState, ErrorNote, Field, FormActions, Input, Modal, PageHeader, SearchInput, StatCard, Table, Td, Tr, useToast } from "@/components/ui";
+import { Badge, Button, Card, EmptyState, ErrorNote, Field, FormActions, IconButton, Input, Modal, PageHeader, SearchInput, StatCard, Table, Td, Tr, useToast } from "@/components/ui";
 
 /** Tuition waived so far by a scholarship, from the invoices it discounted. */
 const waivedBy = (db: DemoDb, s: Scholarship) => db.invoices.filter((i) => i.discountLabel?.startsWith(s.name)).reduce((sum, i) => sum + i.discount, 0);
@@ -59,9 +59,7 @@ function Scholarships({ db }: { db: DemoDb }) {
             <Td className="tabular-nums">{taka(waivedBy(db, s))}</Td>
             <Td className="text-right">
               {manage && (
-                <Button size="sm" variant="ghost" onClick={() => setEditing(s)}>
-                  Edit
-                </Button>
+                <IconButton icon="pencil" label="Edit" onClick={() => setEditing(s)} />
               )}
             </Td>
           </Tr>

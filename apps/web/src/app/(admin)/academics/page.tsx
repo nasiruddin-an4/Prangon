@@ -1,5 +1,6 @@
 "use client";
 
+import { confirmAction } from "@/lib/alerts";
 import { useState, type FormEvent } from "react";
 import { useAuth } from "@/lib/auth";
 import { lookup, newId } from "@/lib/demo/logic";
@@ -7,7 +8,7 @@ import { useDemo } from "@/lib/demo/store";
 import type { Course, DemoDb, Department, Faculty, Program, Section, Semester, SemesterStatus } from "@/lib/demo/types";
 import { DemoLoading, DemoNotice, EntityForm, FilterSelect, opts, Tabs, Toolbar } from "@/components/demo";
 import { Icon } from "@/components/icons";
-import { Badge, Button, Card, EmptyState, ErrorNote, Field, FormActions, formatDate, Input, Modal, PageHeader, Select, StatCard, Table, Td, Tr, useToast } from "@/components/ui";
+import { Badge, Button, Card, EmptyState, ErrorNote, Field, FormActions, formatDate, IconButton, Input, Modal, PageHeader, Select, StatCard, Table, Td, Tr, useToast } from "@/components/ui";
 
 type Tab = "structure" | "courses" | "semesters" | "sections";
 
@@ -88,9 +89,7 @@ function Structure({ db }: { db: DemoDb }) {
           actions={
             manage && (
               <div className="flex gap-1">
-                <Button size="sm" variant="ghost" onClick={() => setModal({ kind: "faculty", item: f })}>
-                  Edit
-                </Button>
+                <IconButton icon="pencil" label="Edit" onClick={() => setModal({ kind: "faculty", item: f })} />
                 <Button size="sm" variant="secondary" icon="plus" onClick={() => setModal({ kind: "department", item: null, facultyId: f.id })}>
                   Department
                 </Button>
@@ -112,9 +111,7 @@ function Structure({ db }: { db: DemoDb }) {
                     </span>
                     {manage && (
                       <>
-                        <Button size="sm" variant="ghost" onClick={() => setModal({ kind: "department", item: d })}>
-                          Edit
-                        </Button>
+                        <IconButton icon="pencil" label="Edit" onClick={() => setModal({ kind: "department", item: d })} />
                         <Button size="sm" variant="ghost" icon="plus" onClick={() => setModal({ kind: "program", item: null, departmentId: d.id })}>
                           Program
                         </Button>
@@ -133,9 +130,7 @@ function Structure({ db }: { db: DemoDb }) {
                               {p.durationSemesters} semesters · {p.totalCredits} credits · {db.students.filter((s) => s.programId === p.id).length} students
                             </span>
                             {manage && (
-                              <button onClick={() => setModal({ kind: "program", item: p })} className="text-xs text-accent hover:underline">
-                                Edit
-                              </button>
+                              <IconButton icon="pencil" label={`Edit ${p.code}`} onClick={() => setModal({ kind: "program", item: p })} className="size-7" />
                             )}
                           </li>
                         ))}
@@ -248,24 +243,19 @@ function Courses({ db }: { db: DemoDb }) {
             <Td className="text-right whitespace-nowrap">
               {manage && (
                 <>
-                  <Button size="sm" variant="ghost" onClick={() => setEditing(c)}>
-                    Edit
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
+                  <IconButton icon="pencil" label="Edit" onClick={() => setEditing(c)} />
+                  <IconButton icon="trash" label="Delete" tone="danger"
                     disabled={inUse(c.id)}
                     title={inUse(c.id) ? "Taught in a section, so it can't be deleted" : undefined}
-                    onClick={() => {
-                      if (!window.confirm(`Delete ${c.code}?`)) return;
+                    onClick={async () => {
+                      if (!(await confirmAction({ title: `Delete ${c.code}?`, text: "The course is removed from the catalogue. This can't be undone.", confirmText: "Delete", danger: true }))) return;
                       update((d) => {
                         d.courses = d.courses.filter((x) => x.id !== c.id);
                       });
                       toast(`${c.code} deleted`);
                     }}
-                  >
-                    Delete
-                  </Button>
+                  
+/>
                 </>
               )}
             </Td>
@@ -339,9 +329,7 @@ function Semesters({ db }: { db: DemoDb }) {
               </Td>
               <Td className="text-right">
                 {manage && (
-                  <Button size="sm" variant="ghost" onClick={() => setEditing(s)}>
-                    Edit
-                  </Button>
+                  <IconButton icon="pencil" label="Edit" onClick={() => setEditing(s)} />
                 )}
               </Td>
             </Tr>
@@ -422,9 +410,7 @@ function Sections({ db }: { db: DemoDb }) {
             </Td>
             <Td className="text-right">
               {manage && (
-                <Button size="sm" variant="ghost" onClick={() => setEditing(s)}>
-                  Edit
-                </Button>
+                <IconButton icon="pencil" label="Edit" onClick={() => setEditing(s)} />
               )}
             </Td>
           </Tr>

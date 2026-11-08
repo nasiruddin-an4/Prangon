@@ -1,5 +1,6 @@
 "use client";
 
+import { confirmAction } from "@/lib/alerts";
 import { useState, type FormEvent } from "react";
 import { useAuth } from "@/lib/auth";
 import { lookup, newId, nowIso, todayDhaka } from "@/lib/demo/logic";
@@ -7,7 +8,7 @@ import { useDemo } from "@/lib/demo/store";
 import type { DemoDb, Notice, NoticeAudience } from "@/lib/demo/types";
 import { DemoLoading, DemoNotice, Tabs, Textarea } from "@/components/demo";
 import { Icon } from "@/components/icons";
-import { Badge, Button, Card, cx, EmptyState, ErrorNote, Field, FormActions, formatDate, Input, Modal, PageHeader, SearchInput, Select, timeAgo, useToast } from "@/components/ui";
+import { Badge, Button, Card, cx, EmptyState, ErrorNote, Field, FormActions, formatDate, IconButton, Input, Modal, PageHeader, SearchInput, Select, timeAgo, useToast } from "@/components/ui";
 
 const AUDIENCE: Record<NoticeAudience, { label: string; tone: "accent" | "success" | "warning" | "neutral" }> = {
   EVERYONE: { label: "Everyone", tone: "accent" },
@@ -147,22 +148,17 @@ function NoticeBoard({
                       >
                         {n.pinned ? "Unpin" : "Pin"}
                       </Button>
-                      <Button size="sm" variant="ghost" onClick={() => onEdit(n)}>
-                        Edit
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => {
-                          if (!window.confirm(`Delete "${n.title}"?`)) return;
+                      <IconButton icon="pencil" label="Edit" onClick={() => onEdit(n)} />
+                      <IconButton icon="trash" label="Delete" tone="danger"
+                        onClick={async () => {
+                          if (!(await confirmAction({ title: "Delete this notice?", text: n.title, confirmText: "Delete", danger: true }))) return;
                           update((d) => {
                             d.notices = d.notices.filter((x) => x.id !== n.id);
                           });
                           toast("Notice deleted");
                         }}
-                      >
-                        Delete
-                      </Button>
+                      
+/>
                     </div>
                   )}
                 </div>

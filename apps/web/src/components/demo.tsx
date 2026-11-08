@@ -1,5 +1,6 @@
 "use client";
 
+import { confirmAction } from "@/lib/alerts";
 import { useState, type FormEvent, type ReactNode, type TextareaHTMLAttributes } from "react";
 import { useAuth } from "@/lib/auth";
 import { useApi } from "@/lib/use-api";
@@ -43,8 +44,8 @@ export function DemoNotice() {
       <Icon name="info" className="size-3.5" />
       <span className="mr-1 font-medium">Demo data, saved in this browser</span>
       <button
-        onClick={() => {
-          if (!window.confirm("Reset all demo data for this institution? Your changes in Admissions, Students, Academics, Attendance, Exams and Fees will be lost.")) return;
+        onClick={async () => {
+          if (!(await confirmAction({ title: "Reset all demo data?", text: "Your changes in every module for this institution are replaced with fresh demo data. This can't be undone.", confirmText: "Reset", danger: true }))) return;
           reset();
           toast("Demo data reset");
         }}

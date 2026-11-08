@@ -1,5 +1,6 @@
 "use client";
 
+import { BRAND } from "@/lib/brand";
 import { useState, type FormEvent } from "react";
 import { api, ApiError } from "@/lib/api";
 import { useApi } from "@/lib/use-api";
@@ -51,7 +52,7 @@ export default function ApiKeysPage() {
     <>
       <PageHeader
         title="API keys"
-        description="Let other systems (your website, ERP or SMS gateway) use the EduManage API. A key has the same permissions as the person who created it."
+        description={`Let other systems (your website, ERP or SMS gateway) use the ${BRAND.name} API. A key has the same permissions as the person who created it.`}
       />
       <div className="space-y-6">
         <Card title="Create a key">

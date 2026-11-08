@@ -1,3 +1,4 @@
+import { BRAND } from "@/lib/brand";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Icon } from "@/components/icons";
@@ -5,7 +6,7 @@ import { LoginForm } from "./login-form";
 
 export const metadata: Metadata = { title: "Sign in" };
 
-const STEPS = ["Admission", "Enrollment", "Academics", "Attendance", "Exams", "Results", "Fees", "Graduation"];
+const STEPS = ["Admission", "Enrollment", "Academics", "Attendance", "Exams", "Results", "Fees", "Clearance", "Graduation"];
 
 export default function LoginPage() {
   return (
@@ -18,13 +19,14 @@ export default function LoginPage() {
           <span className="grid size-9 place-items-center rounded-xl bg-white/10 ring-1 ring-white/20">
             <Icon name="graduation" className="size-5" />
           </span>
-          <span className="text-lg font-semibold tracking-tight">EduManage</span>
+          <span className="text-lg font-semibold tracking-tight">{BRAND.name}</span>
+          <span className="text-sm text-white/50">{BRAND.bangla}</span>
         </div>
 
         <div className="relative max-w-lg">
-          <h1 className="text-4xl leading-[1.15] font-semibold tracking-tight">One platform for the whole student journey.</h1>
+          <h1 className="text-4xl leading-[1.15] font-semibold tracking-tight">{BRAND.tagline}</h1>
           <p className="mt-4 text-base text-white/70">
-            Admissions, academics, attendance, examinations and fees for universities across Bangladesh, in Bangla and English.
+            Admissions, academics, attendance, exams, fees, library and a self-service student portal for universities across Bangladesh. Every office works in one place, and work flows between them.
           </p>
           <ol className="mt-10 flex flex-wrap gap-2">
             {STEPS.map((step, i) => (
@@ -45,10 +47,11 @@ export default function LoginPage() {
             <span className="grid size-9 place-items-center rounded-xl bg-accent text-accent-text">
               <Icon name="graduation" className="size-5" />
             </span>
-            <span className="text-lg font-semibold">EduManage</span>
+            <span className="text-lg font-semibold">{BRAND.name}</span>
+            <span className="text-sm text-subtle">{BRAND.bangla}</span>
           </div>
           <h2 className="text-2xl font-semibold tracking-tight">Welcome back</h2>
-          <p className="mt-1.5 text-sm text-muted">Sign in with the institution code your administrator gave you.</p>
+          <p className="mt-1.5 text-sm text-muted">Staff and students: sign in with your institution code and university email.</p>
           <Suspense>
             <LoginForm />
           </Suspense>

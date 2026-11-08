@@ -1,5 +1,6 @@
 "use client";
 
+import { confirmAction } from "@/lib/alerts";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { activeAllocation, downloadCsv, lookup, newId, roomLoad, taka, todayDhaka } from "@/lib/demo/logic";
@@ -118,8 +119,8 @@ function HallView({ db, hostel }: { db: DemoDb; hostel: Hostel }) {
                               </span>
                               {manage && (
                                 <button
-                                  onClick={() => {
-                                    if (!window.confirm(`Vacate ${s?.name} from room ${room.number}?`)) return;
+                                  onClick={async () => {
+                                    if (!(await confirmAction({ title: `Vacate ${s?.name}?`, text: `Their bed in room ${room.number} is freed from today.`, confirmText: "Vacate", danger: true }))) return;
                                     update((d) => {
                                       d.allocations.find((x) => x.id === a.id)!.to = todayDhaka();
                                     });

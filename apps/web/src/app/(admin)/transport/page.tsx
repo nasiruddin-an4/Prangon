@@ -7,7 +7,7 @@ import { useDemo } from "@/lib/demo/store";
 import type { BusRoute, DemoDb } from "@/lib/demo/types";
 import { DemoLoading, DemoNotice, EntityForm, Progress } from "@/components/demo";
 import { Icon } from "@/components/icons";
-import { Avatar, Badge, Button, Card, EmptyState, ErrorNote, Field, FormActions, Modal, PageHeader, Select, StatCard, useToast } from "@/components/ui";
+import { Avatar, Badge, Button, Card, EmptyState, ErrorNote, Field, FormActions, IconButton, Modal, PageHeader, Select, StatCard, useToast } from "@/components/ui";
 
 export default function TransportPage() {
   const { can } = useAuth();
@@ -101,9 +101,7 @@ function RouteCard({ db, route, onEdit }: { db: DemoDb; route: BusRoute; onEdit?
             CSV
           </Button>
           {onEdit && (
-            <Button size="sm" variant="ghost" onClick={onEdit}>
-              Edit
-            </Button>
+            <IconButton icon="pencil" label="Edit" onClick={onEdit} />
           )}
         </div>
       }

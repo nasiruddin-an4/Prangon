@@ -7,7 +7,7 @@ import { useDemo } from "@/lib/demo/store";
 import type { Guardian, Student } from "@/lib/demo/types";
 import { DemoLoading, DemoNotice, FilterSelect, Toolbar, useStudentIdFormat } from "@/components/demo";
 import { programLine, STATUS_TONE, statusLabel, StudentForm, StudentProfile } from "@/components/students";
-import { Avatar, Badge, Button, Card, EmptyState, ErrorNote, FormActions, Modal, PageHeader, Pagination, SearchInput, StatCard, Table, Td, Tr, useToast } from "@/components/ui";
+import { Avatar, Badge, Button, Card, EmptyState, ErrorNote, FormActions, IconButton, Modal, PageHeader, Pagination, SearchInput, StatCard, Table, Td, Tr, useToast } from "@/components/ui";
 
 const PAGE_SIZE = 15;
 
@@ -176,9 +176,7 @@ function StudentList({ onOpen, onAdd }: { onOpen: (id: string) => void; onAdd: (
                 </Badge>
               </Td>
               <Td className="text-right">
-                <Button size="sm" variant="ghost" onClick={() => onOpen(s.id)}>
-                  View
-                </Button>
+                <IconButton icon="eye" label="View" onClick={() => onOpen(s.id)} />
               </Td>
             </Tr>
           );

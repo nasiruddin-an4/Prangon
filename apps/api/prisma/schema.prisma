@@ -1,4 +1,4 @@
-// EduManage – Phase 1 (Foundation) schema.
+// Prangon – Phase 1 (Foundation) schema.
 // Conventions: UUID keys, snake_case tables/columns, every tenant-owned row
 // carries institution_id, money will be NUMERIC (never float).
 

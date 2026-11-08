@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   transpilePackages: ["@edumanage/shared"],
+  // Keep the dev-only Next.js badge off the sidebar's collapse button.
+  devIndicators: { position: "bottom-right" },
   turbopack: {
     rules: {
       "*.css": {

@@ -1,12 +1,13 @@
 "use client";
 
+import { confirmAction } from "@/lib/alerts";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { downloadCsv, methodLabel, monthLabel, newId, nextCounter, nowIso, PAYMENT_METHODS, payslip, person, PF_RATE, sameRef, taka, todayDhaka } from "@/lib/demo/logic";
 import { useDemo } from "@/lib/demo/store";
 import type { DemoDb, Expense, ExpenseCategory, PaymentMethod, PayrollLine, PayrollRun, PersonRef, Salary } from "@/lib/demo/types";
 import { DemoLoading, DemoNotice, EntityForm, FilterSelect, InfoGrid, PersonCell, PrintButton, Progress, Tabs, Toolbar } from "@/components/demo";
-import { Badge, Button, Card, EmptyState, FormActions, formatDate, Modal, PageHeader, StatCard, Table, Td, Tr, useToast } from "@/components/ui";
+import { Badge, Button, Card, EmptyState, FormActions, formatDate, IconButton, Modal, PageHeader, StatCard, Table, Td, Tr, useToast } from "@/components/ui";
 
 const CATEGORIES: ExpenseCategory[] = ["Utilities", "Maintenance", "Supplies", "Events", "Transport", "IT & software", "Other"];
 type Tab = "expenses" | "payroll" | "salaries";
@@ -125,9 +126,7 @@ function Expenses({ db }: { db: DemoDb }) {
               </Td>
               <Td className="text-right">
                 {manage && (
-                  <Button size="sm" variant="ghost" onClick={() => setEditing(e)}>
-                    Edit
-                  </Button>
+                  <IconButton icon="pencil" label="Edit" onClick={() => setEditing(e)} />
                 )}
               </Td>
             </Tr>
@@ -327,8 +326,8 @@ function RunDetail({ db, run, onClose }: { db: DemoDb; run: PayrollRun; onClose:
         {run.status === "DRAFT" && can("finance.manage") && (
           <Button
             icon="check"
-            onClick={() => {
-              if (!window.confirm(`Mark ${monthLabel(run.month)} salaries (${taka(totals.net)}) as paid?`)) return;
+            onClick={async () => {
+              if (!(await confirmAction({ title: `Mark ${monthLabel(run.month)} salaries as paid?`, text: `${taka(totals.net)} to ${run.lines.length} people. Payslips will show this payment date.`, confirmText: "Mark as paid" }))) return;
               update((d) => {
                 Object.assign(d.payrollRuns.find((r) => r.id === run.id)!, { status: "PAID", paidAt: nowIso() });
               });

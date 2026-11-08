@@ -1,5 +1,6 @@
 "use client";
 
+import { BRAND } from "@/lib/brand";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { createInstitutionSchema, type Paginated } from "@edumanage/shared";
@@ -73,7 +74,7 @@ export default function InstitutionsPage() {
       <PageHeader
         eyebrow="Platform"
         title="Institutions"
-        description="Every university, college and school on EduManage. Each one's data is kept separate."
+        description={`Every university, college and school on ${BRAND.name}. Each one's data is kept separate.`}
         actions={<Button icon="plus" onClick={() => setCreating(true)}>New institution</Button>}
       />
       <Card title={<SearchInput value={search} onChange={setSearch} placeholder="Search by name or code" />} actions={data && <span className="text-xs text-muted">{data.total} total</span>}>

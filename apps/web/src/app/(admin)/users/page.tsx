@@ -25,6 +25,7 @@ import {
   Table,
   Td,
   timeAgo,
+  IconButton,
   Tr,
   useToast,
 } from "@/components/ui";
@@ -123,9 +124,7 @@ export default function UsersPage() {
                 <Td className="text-right whitespace-nowrap">
                   {manage && u.id !== me?.id && (
                     <>
-                      <Button size="sm" variant="ghost" onClick={() => setEditing(u)}>
-                        Edit
-                      </Button>
+                      <IconButton icon="pencil" label="Edit" onClick={() => setEditing(u)} />
                       <Button size="sm" variant="ghost" onClick={() => setStatus(u, u.status === "ACTIVE" ? "SUSPENDED" : "ACTIVE")}>
                         {u.status === "ACTIVE" ? "Suspend" : "Activate"}
                       </Button>

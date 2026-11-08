@@ -23,7 +23,7 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(
       app,
       new DocumentBuilder()
-        .setTitle('EduManage API')
+        .setTitle('Prangon API')
         .setDescription('Student Information & Academic Management Platform')
         .setVersion('1.0')
         .addBearerAuth()

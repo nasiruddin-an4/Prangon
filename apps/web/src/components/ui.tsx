@@ -6,12 +6,12 @@ import {
   useCallback,
   useEffect,
   useRef,
-  useState,
   type ButtonHTMLAttributes,
   type InputHTMLAttributes,
   type ReactNode,
   type SelectHTMLAttributes,
 } from "react";
+import { notify } from "@/lib/alerts";
 import { Icon, type IconName } from "./icons";
 
 export const cx = (...classes: (string | false | null | undefined)[]) => classes.filter(Boolean).join(" ");
@@ -47,6 +47,35 @@ export function Button({
     >
       {icon && <Icon name={icon} className={size === "md" ? "size-4" : "size-3.5"} />}
       {children}
+    </button>
+  );
+}
+
+/**
+ * Square icon-only button for row actions (view, edit, delete). The label is
+ * the accessible name and shows as a tooltip on hover.
+ */
+export function IconButton({
+  icon,
+  label,
+  tone = "default",
+  className,
+  ...props
+}: ButtonHTMLAttributes<HTMLButtonElement> & { icon: IconName; label: string; tone?: "default" | "danger" }) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      title={label}
+      {...props}
+      className={cx(
+        "inline-grid size-8 shrink-0 place-items-center rounded-lg transition-colors disabled:cursor-not-allowed disabled:opacity-40",
+        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+        tone === "danger" ? "text-subtle hover:bg-danger/10 hover:text-danger" : "text-subtle hover:bg-surface-2 hover:text-accent",
+        className,
+      )}
+    >
+      <Icon name={icon} className="size-4" />
     </button>
   );
 }
@@ -302,37 +331,14 @@ export function Loading({ label = "Loading…" }: { label?: string }) {
   );
 }
 
-interface Toast {
-  id: number;
-  tone: "success" | "error";
-  message: string;
-}
+type ToastTone = "success" | "error";
 
-const ToastContext = createContext<(message: string, tone?: Toast["tone"]) => void>(() => undefined);
+const ToastContext = createContext<(message: string, tone?: ToastTone) => void>((message, tone) => void notify(message, tone));
 
+/** Notifications are drawn by SweetAlert2 (see lib/alerts.ts); this keeps the `useToast()` API pages use. */
 export function ToastProvider({ children }: { children: ReactNode }) {
-  const [toasts, setToasts] = useState<Toast[]>([]);
-  const push = useCallback((message: string, tone: Toast["tone"] = "success") => {
-    const id = Date.now() + Math.random();
-    // Keep the three most recent, so a burst of actions doesn't cover the page.
-    setToasts((t) => [...t.slice(-2), { id, tone, message }]);
-    setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 3500);
-  }, []);
-  return (
-    <ToastContext value={push}>
-      {children}
-      <div aria-live="polite" className="pointer-events-none fixed right-4 bottom-4 z-50 flex flex-col gap-2">
-        {toasts.map((t) => (
-          <div key={t.id} className="animate-toast flex items-center gap-2.5 rounded-xl border border-border bg-surface px-4 py-3 text-sm shadow-pop">
-            <span className={cx("grid size-5 place-items-center rounded-full", t.tone === "success" ? "bg-success/15 text-success" : "bg-danger/15 text-danger")}>
-              <Icon name={t.tone === "success" ? "check" : "alert"} className="size-3" />
-            </span>
-            {t.message}
-          </div>
-        ))}
-      </div>
-    </ToastContext>
-  );
+  const push = useCallback((message: string, tone: ToastTone = "success") => void notify(message, tone), []);
+  return <ToastContext value={push}>{children}</ToastContext>;
 }
 
 export const useToast = () => use(ToastContext);

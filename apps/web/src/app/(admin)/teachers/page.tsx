@@ -1,12 +1,13 @@
 "use client";
 
+import { confirmAction } from "@/lib/alerts";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { BD_PHONE, downloadCsv, lookup, newId, normalizePhone, todayDhaka, WEEKDAYS } from "@/lib/demo/logic";
 import { useDemo } from "@/lib/demo/store";
 import type { DemoDb, Staff, StaffStatus, Teacher } from "@/lib/demo/types";
 import { DemoLoading, DemoNotice, EntityForm, FilterSelect, InfoGrid, opts, Tabs, Toolbar } from "@/components/demo";
-import { Avatar, Badge, Button, Card, EmptyState, FormActions, formatDate, Modal, PageHeader, SearchInput, StatCard, Table, Td, Tr, useToast } from "@/components/ui";
+import { Avatar, Badge, Button, Card, EmptyState, FormActions, formatDate, IconButton, Modal, PageHeader, SearchInput, StatCard, Table, Td, Tr, useToast } from "@/components/ui";
 
 const DESIGNATIONS = ["Professor", "Associate Professor", "Assistant Professor", "Lecturer"] as const;
 const STAFF_STATUS: Record<StaffStatus, { label: string; tone: "success" | "warning" | "neutral" }> = {
@@ -119,13 +120,9 @@ function Teachers({ db }: { db: DemoDb }) {
                 <p className="tabular-nums">{t.phone}</p>
               </Td>
               <Td className="text-right whitespace-nowrap">
-                <Button size="sm" variant="ghost" onClick={() => setProfile(t)}>
-                  View
-                </Button>
+                <IconButton icon="eye" label="View" onClick={() => setProfile(t)} />
                 {manage && (
-                  <Button size="sm" variant="ghost" onClick={() => setEditing(t)}>
-                    Edit
-                  </Button>
+                  <IconButton icon="pencil" label="Edit" onClick={() => setEditing(t)} />
                 )}
               </Td>
             </Tr>
@@ -141,8 +138,8 @@ function Teachers({ db }: { db: DemoDb }) {
             onClose={() => setProfile(null)}
             onRemove={
               manage && !coursesOf(profile.id).length
-                ? () => {
-                    if (!window.confirm(`Remove ${profile.name}?`)) return;
+                ? async () => {
+                    if (!(await confirmAction({ title: `Remove ${profile.name}?`, text: "They're removed from the teacher list. This can't be undone.", confirmText: "Remove", danger: true }))) return;
                     update((d) => {
                       d.teachers = d.teachers.filter((x) => x.id !== profile.id);
                     });
@@ -323,9 +320,7 @@ function StaffList({ db }: { db: DemoDb }) {
             </Td>
             <Td className="text-right">
               {manage && (
-                <Button size="sm" variant="ghost" onClick={() => setEditing(s)}>
-                  Edit
-                </Button>
+                <IconButton icon="pencil" label="Edit" onClick={() => setEditing(s)} />
               )}
             </Td>
           </Tr>

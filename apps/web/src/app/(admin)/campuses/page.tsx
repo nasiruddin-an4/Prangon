@@ -6,7 +6,7 @@ import { api, ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { useApi } from "@/lib/use-api";
 import { Icon } from "@/components/icons";
-import { Badge, Button, Card, EmptyState, ErrorNote, Field, FormActions, Input, issuesToMessage, Loading, Modal, PageHeader, Table, Td, Tr, useToast } from "@/components/ui";
+import { Badge, Button, Card, EmptyState, ErrorNote, Field, FormActions, IconButton, Input, issuesToMessage, Loading, Modal, PageHeader, Table, Td, Tr, useToast } from "@/components/ui";
 
 interface Campus {
   id: string;
@@ -76,9 +76,7 @@ export default function CampusesPage() {
                 <Td>{c.isActive ? <Badge tone="success" dot>Active</Badge> : <Badge dot>Inactive</Badge>}</Td>
                 <Td className="text-right">
                   {manage && (
-                    <Button size="sm" variant="ghost" onClick={() => setEditing(c)}>
-                      Edit
-                    </Button>
+                    <IconButton icon="pencil" label="Edit" onClick={() => setEditing(c)} />
                   )}
                 </Td>
               </Tr>

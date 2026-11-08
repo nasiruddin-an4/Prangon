@@ -7,7 +7,7 @@ import { useDemo } from "@/lib/demo/store";
 import type { Guardian } from "@/lib/demo/types";
 import { DemoLoading, DemoNotice, FilterSelect, Toolbar } from "@/components/demo";
 import { GuardianForm, StudentProfile } from "@/components/students";
-import { Avatar, Button, Card, EmptyState, Modal, PageHeader, Pagination, SearchInput, StatCard, Table, Td, Tr } from "@/components/ui";
+import { Avatar, Button, Card, EmptyState, IconButton, Modal, PageHeader, Pagination, SearchInput, StatCard, Table, Td, Tr } from "@/components/ui";
 
 const PAGE_SIZE = 15;
 
@@ -97,9 +97,7 @@ function GuardianList({ onOpen }: { onOpen: (studentId: string) => void }) {
             </Td>
             <Td className="text-right">
               {can("guardians.manage") && (
-                <Button size="sm" variant="ghost" onClick={() => setEditing(g)}>
-                  Edit
-                </Button>
+                <IconButton icon="pencil" label="Edit" onClick={() => setEditing(g)} />
               )}
             </Td>
           </Tr>

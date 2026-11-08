@@ -7,7 +7,7 @@ import { useDemo } from "@/lib/demo/store";
 import { isPaid, raiseCharge } from "@/lib/demo/workflows";
 import type { Book, BookIssue, DemoDb, PersonRef } from "@/lib/demo/types";
 import { DemoLoading, DemoNotice, EntityForm, FilterSelect, PersonCell, PersonPicker, Tabs, Toolbar } from "@/components/demo";
-import { Badge, Button, Card, EmptyState, ErrorNote, Field, FormActions, formatDate, Input, Modal, PageHeader, SearchInput, Select, StatCard, Table, Td, Tr, useToast } from "@/components/ui";
+import { Badge, Button, Card, EmptyState, ErrorNote, Field, FormActions, formatDate, IconButton, Input, Modal, PageHeader, SearchInput, Select, StatCard, Table, Td, Tr, useToast } from "@/components/ui";
 
 type Tab = "loans" | "catalogue" | "history";
 
@@ -241,9 +241,7 @@ function Catalogue({ db }: { db: DemoDb }) {
               <Td>{out >= b.copies ? <Badge tone="danger">All {b.copies} out</Badge> : <span className="tabular-nums">{b.copies - out} of {b.copies}</span>}</Td>
               <Td className="text-right">
                 {can("library.manage") && (
-                  <Button size="sm" variant="ghost" onClick={() => setEditing(b)}>
-                    Edit
-                  </Button>
+                  <IconButton icon="pencil" label="Edit" onClick={() => setEditing(b)} />
                 )}
               </Td>
             </Tr>

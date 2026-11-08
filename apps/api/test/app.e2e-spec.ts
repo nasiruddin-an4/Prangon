@@ -13,7 +13,7 @@ import { PrismaService } from '../src/prisma/prisma.service.js';
 const password = process.env.SEED_SUPERADMIN_PASSWORD!;
 const suffix = Date.now().toString(36);
 
-describe('EduManage API (e2e)', () => {
+describe('Prangon API (e2e)', () => {
   let app: INestApplication<App>;
   const http = () => request(app.getHttpServer());
   const token = async (body: object) => {

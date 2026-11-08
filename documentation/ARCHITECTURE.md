@@ -1,4 +1,4 @@
-# EduManage architecture
+# Prangon architecture
 
 Decisions made on 2026-11-08: **university-first**, **multi-institution SaaS**, **web + mobile + public API**, **Next.js + NestJS + PostgreSQL**.
 

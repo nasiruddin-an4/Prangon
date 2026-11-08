@@ -1,5 +1,6 @@
 "use client";
 
+import { confirmAction } from "@/lib/alerts";
 import { useState, type FormEvent } from "react";
 import { useAuth } from "@/lib/auth";
 import { grade, GRADE_SCALE, lookup, MARK_PARTS, newId, todayDhaka } from "@/lib/demo/logic";
@@ -8,7 +9,7 @@ import type { DemoDb, Exam, ExamType, Mark } from "@/lib/demo/types";
 import { DemoLoading, DemoNotice, FilterSelect, PrintButton, Tabs, Toolbar } from "@/components/demo";
 import { AdmitCard } from "@/components/admit-card";
 import { examEligibility } from "@/lib/demo/workflows";
-import { Badge, Button, Card, cx, EmptyState, ErrorNote, Field, FormActions, formatDate, Input, Modal, PageHeader, Select, StatCard, Table, Td, Tr, useToast } from "@/components/ui";
+import { Badge, Button, Card, cx, EmptyState, ErrorNote, Field, FormActions, formatDate, IconButton, Input, Modal, PageHeader, Select, StatCard, Table, Td, Tr, useToast } from "@/components/ui";
 
 type Tab = "schedule" | "marks" | "admit" | "scale";
 const TYPE_LABEL: Record<ExamType, string> = { CLASS_TEST: "Class test", MIDTERM: "Midterm", FINAL: "Final" };
@@ -117,22 +118,17 @@ function Schedule({ db }: { db: DemoDb }) {
                 <Td className="text-right whitespace-nowrap">
                   {manage && (
                     <>
-                      <Button size="sm" variant="ghost" onClick={() => setEditing(e)}>
-                        Edit
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => {
-                          if (!window.confirm(`Delete ${e.name}?`)) return;
+                      <IconButton icon="pencil" label="Edit" onClick={() => setEditing(e)} />
+                      <IconButton icon="trash" label="Delete" tone="danger"
+                        onClick={async () => {
+                          if (!(await confirmAction({ title: `Delete ${e.name}?`, text: "It's removed from the exam schedule.", confirmText: "Delete", danger: true }))) return;
                           update((d) => {
                             d.exams = d.exams.filter((x) => x.id !== e.id);
                           });
                           toast("Exam deleted");
                         }}
-                      >
-                        Delete
-                      </Button>
+                      
+/>
                     </>
                   )}
                 </Td>

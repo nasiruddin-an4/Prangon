@@ -1,5 +1,6 @@
 "use client";
 
+import { confirmAction } from "@/lib/alerts";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { downloadCsv, formatGpa, lookup, markTotal, nowIso, semesterResult, todayDhaka } from "@/lib/demo/logic";
@@ -167,8 +168,8 @@ function Results({ db }: { db: DemoDb }) {
                   size="sm"
                   disabled={!allComplete}
                   title={allComplete ? undefined : "Every student needs all four marks in every course"}
-                  onClick={() => {
-                    if (!window.confirm(`Publish the ${section?.name} result? Marks will be locked.`)) return;
+                  onClick={async () => {
+                    if (!(await confirmAction({ title: `Publish the ${section?.name} result?`, text: "Students see their grades in the portal, and marks are locked until it's unpublished.", confirmText: "Publish" }))) return;
                     update((d) => {
                       d.publications.push({ sectionId, publishedAt: nowIso(), publishedBy: actor });
                     });

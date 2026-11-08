@@ -91,7 +91,7 @@
   --shadow-card: var(--shadow-md);
   --shadow-soft: var(--shadow-sm);
   --shadow-pop: var(--shadow-lg);
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), var(--font-bangla), ui-sans-serif, system-ui, sans-serif;
 }
 
 body {
@@ -131,3 +131,17 @@ dialog::backdrop {
   .print-area { position: absolute; inset: 0; padding: 24px; background: white; color: black; }
   .no-print { display: none !important; }
 }
+
+/* SweetAlert2: match the app's type, corners and shadows (lib/alerts.ts). */
+.swal2-popup.prangon-swal {
+  font-family: inherit;
+  border-radius: 16px;
+  color: var(--text);
+}
+.swal2-popup.prangon-swal .swal2-title { font-size: 1.25rem; font-weight: 600; }
+.swal2-popup.prangon-swal .swal2-html-container { font-size: 0.9rem; color: var(--muted); }
+.swal2-popup.prangon-swal .swal2-styled { border-radius: 10px; font-weight: 500; font-size: 0.875rem; padding: 0.6rem 1.15rem; }
+.swal2-popup.prangon-swal .swal2-styled:focus-visible { box-shadow: 0 0 0 3px rgb(79 70 229 / 0.35); }
+.swal2-popup.swal2-toast.prangon-swal { border-radius: 12px; box-shadow: var(--shadow-lg); padding: 0.6rem 0.9rem; }
+.swal2-popup.swal2-toast.prangon-swal .swal2-title { font-size: 0.875rem; font-weight: 500; margin: 0 0.5rem; }
+.swal2-container { z-index: 60; }
