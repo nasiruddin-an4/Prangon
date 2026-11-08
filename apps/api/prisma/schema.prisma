@@ -1,0 +1,252 @@
+// EduManage – Phase 1 (Foundation) schema.
+// Conventions: UUID keys, snake_case tables/columns, every tenant-owned row
+// carries institution_id, money will be NUMERIC (never float).
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Tenancy ──────────────────────────────────────────────────────────────
+
+enum InstitutionType {
+  UNIVERSITY
+  COLLEGE
+  SCHOOL
+  TRAINING_INSTITUTE
+}
+
+enum InstitutionStatus {
+  TRIAL
+  ACTIVE
+  SUSPENDED
+  CANCELLED
+}
+
+model Institution {
+  id              String            @id @default(uuid(7)) @db.Uuid
+  name            String
+  shortName       String?           @map("short_name")
+  slug            String            @unique
+  type            InstitutionType   @default(UNIVERSITY)
+  status          InstitutionStatus @default(TRIAL)
+  email           String?
+  phone           String?
+  website         String?
+  address         String?
+  logoUrl         String?           @map("logo_url")
+  timezone        String            @default("Asia/Dhaka")
+  currency        String            @default("BDT") @db.Char(3)
+  defaultLocale   String            @default("en") @map("default_locale")
+  studentIdFormat String            @default("{YY}{DEPT}{SEQ:4}") @map("student_id_format")
+  /// Institution-specific configuration (grading scale, academic calendar, …).
+  settings        Json              @default("{}")
+  trialEndsAt     DateTime?         @map("trial_ends_at") @db.Timestamptz
+  createdAt       DateTime          @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime          @updatedAt @map("updated_at") @db.Timestamptz
+
+  campuses  Campus[]
+  users     User[]
+  roles     Role[]
+  auditLogs AuditLog[]
+  apiKeys   ApiKey[]
+
+  @@map("institutions")
+}
+
+model Campus {
+  id            String   @id @default(uuid(7)) @db.Uuid
+  institutionId String   @map("institution_id") @db.Uuid
+  name          String
+  code          String
+  email         String?
+  phone         String?
+  address       String?
+  // Bangladesh administrative address
+  division      String?
+  district      String?
+  upazila       String?
+  isMain        Boolean  @default(false) @map("is_main")
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  institution Institution @relation(fields: [institutionId], references: [id], onDelete: Restrict)
+  userRoles   UserRole[]
+
+  @@unique([institutionId, code])
+  @@index([institutionId])
+  @@map("campuses")
+}
+
+// ─── Identity & access ────────────────────────────────────────────────────
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DISABLED
+}
+
+model User {
+  id              String     @id @default(uuid(7)) @db.Uuid
+  /// NULL only for platform (Super Admin) accounts.
+  institutionId   String?    @map("institution_id") @db.Uuid
+  email           String
+  emailVerified   Boolean    @default(false) @map("email_verified")
+  passwordHash    String?    @map("password_hash")
+  fullName        String     @map("full_name")
+  phone           String?
+  avatarUrl       String?    @map("avatar_url")
+  status          UserStatus @default(ACTIVE)
+  isPlatformAdmin Boolean    @default(false) @map("is_platform_admin")
+  lastSignInAt    DateTime?  @map("last_sign_in_at") @db.Timestamptz
+  createdById     String?    @map("created_by") @db.Uuid
+  createdAt       DateTime   @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime   @updatedAt @map("updated_at") @db.Timestamptz
+
+  institution Institution? @relation(fields: [institutionId], references: [id], onDelete: Restrict)
+  roles       UserRole[]
+  apiKeys     ApiKey[]
+
+  // Email is unique per institution; platform accounts get a partial unique
+  // index in the migration (Postgres treats NULL institution ids as distinct).
+  @@unique([institutionId, email])
+  @@map("users")
+}
+
+model Permission {
+  key         String @id
+  module      String
+  description String
+
+  roles RolePermission[]
+
+  @@map("permissions")
+}
+
+model Role {
+  id            String   @id @default(uuid(7)) @db.Uuid
+  institutionId String   @map("institution_id") @db.Uuid
+  key           String
+  name          String
+  description   String?
+  /// Created from a default template: permissions editable, not deletable.
+  isSystem      Boolean  @default(false) @map("is_system")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  institution Institution      @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  permissions RolePermission[]
+  users       UserRole[]
+
+  @@unique([institutionId, key])
+  @@map("roles")
+}
+
+model RolePermission {
+  roleId        String @map("role_id") @db.Uuid
+  permissionKey String @map("permission_key")
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionKey], references: [key], onDelete: Cascade)
+
+  @@id([roleId, permissionKey])
+  @@map("role_permissions")
+}
+
+model UserRole {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  roleId    String   @map("role_id") @db.Uuid
+  /// NULL = the role applies on every campus.
+  campusId  String?  @map("campus_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role    @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  campus Campus? @relation(fields: [campusId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("user_roles")
+}
+
+model AuditLog {
+  id            String   @id @default(uuid(7)) @db.Uuid
+  institutionId String?  @map("institution_id") @db.Uuid
+  actorId       String?  @map("actor_id") @db.Uuid
+  actorName     String?  @map("actor_name")
+  /// e.g. `campus.created`, `user.roles_changed`, `auth.sign_in`.
+  action        String
+  entityType    String   @map("entity_type")
+  entityId      String?  @map("entity_id")
+  changes       Json?
+  ip            String?
+  userAgent     String?  @map("user_agent")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  institution Institution? @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+
+  @@index([institutionId, createdAt(sort: Desc)])
+  @@index([entityType, entityId])
+  @@map("audit_logs")
+}
+
+// ─── Authentication state (@nestjs/authentication stores) ──────────────────
+// Sessions, refresh tokens and API keys are stored by SHA-256 hash only.
+
+model AuthSession {
+  id           String   @id
+  /// Opaque to the auth package: plain text, not uuid.
+  userId       String   @map("user_id")
+  createdAt    DateTime @map("created_at") @db.Timestamptz
+  expiresAt    DateTime @map("expires_at") @db.Timestamptz
+  lastActiveAt DateTime @map("last_active_at") @db.Timestamptz
+  mfa          String?
+  metadata     Json?
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("auth_sessions")
+}
+
+model RefreshToken {
+  id              String    @id
+  familyId        String    @map("family_id")
+  userId          String    @map("user_id")
+  createdAt       DateTime  @map("created_at") @db.Timestamptz
+  expiresAt       DateTime  @map("expires_at") @db.Timestamptz
+  familyExpiresAt DateTime  @map("family_expires_at") @db.Timestamptz
+  usedAt          DateTime? @map("used_at") @db.Timestamptz
+  /// A family is revoked when any of its tokens is.
+  revoked         Boolean   @default(false)
+  claims          Json?
+
+  @@index([familyId])
+  @@index([userId])
+  @@index([familyExpiresAt])
+  @@map("refresh_tokens")
+}
+
+model ApiKey {
+  /// The public part of the key (`edm_<id>_<secret>`).
+  id            String    @id
+  hash          String
+  name          String
+  userId        String    @map("user_id") @db.Uuid
+  institutionId String    @map("institution_id") @db.Uuid
+  expiresAt     DateTime  @map("expires_at") @db.Timestamptz
+  lastUsedAt    DateTime? @map("last_used_at") @db.Timestamptz
+  revokedAt     DateTime? @map("revoked_at") @db.Timestamptz
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  institution Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+
+  @@index([institutionId])
+  @@map("api_keys")
+}

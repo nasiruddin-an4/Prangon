@@ -1,0 +1,133 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  --bg: #f9fafb; /* gray-50 */
+  --surface: #ffffff;
+  --surface-2: #f2f4f8;
+  --surface-3: #e9ecf3;
+  --border: #e4e7ef;
+  --border-strong: #d3d8e4;
+  --text: #0f1424;
+  --muted: #5b6479;
+  --subtle: #8a92a6;
+  --accent: #4f46e5;
+  --accent-hover: #4338ca;
+  --accent-soft: #eef0ff;
+  --accent-text: #ffffff;
+  --danger: #dc2626;
+  --success: #15803d;
+  --warning: #b45309;
+  --info: #0369a1;
+  --shadow-sm: 0 1px 2px rgb(15 20 36 / 0.05);
+  --shadow-md: 0 1px 3px rgb(15 20 36 / 0.06), 0 8px 24px -12px rgb(15 20 36 / 0.12);
+  --shadow-lg: 0 24px 64px -16px rgb(15 20 36 / 0.28);
+}
+
+/* Dark theme is opt-in (data-theme="dark" on <html>); the default is light. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0a0d16;
+  --surface: #121625;
+  --surface-2: #181d2f;
+  --surface-3: #1f2539;
+  --border: #232a40;
+  --border-strong: #2f3752;
+  --text: #e9ecf5;
+  --muted: #9ba3bb;
+  --subtle: #6b7390;
+  --accent: #8b93ff;
+  --accent-hover: #a3a9ff;
+  --accent-soft: #1d2147;
+  --accent-text: #0a0d16;
+  --danger: #f87171;
+  --success: #4ade80;
+  --warning: #fbbf24;
+  --info: #38bdf8;
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-md: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -12px rgb(0 0 0 / 0.5);
+  --shadow-lg: 0 24px 64px -16px rgb(0 0 0 / 0.7);
+}
+
+/* The sidebar is always slate-900, with its own dark palette so every
+   component inside it (links, the tenant switcher, badges) stays legible. */
+.sidebar-dark {
+  color-scheme: dark;
+  --bg: #0f172a;          /* slate-900 */
+  --surface: #0f172a;
+  --surface-2: #1e293b;   /* slate-800 */
+  --surface-3: #334155;   /* slate-700 */
+  --border: #1e293b;
+  --border-strong: #334155;
+  --text: #f1f5f9;        /* slate-100 */
+  --muted: #94a3b8;       /* slate-400 */
+  --subtle: #64748b;      /* slate-500 */
+  --accent: #a5b4fc;      /* indigo-300 */
+  --accent-hover: #c7d2fe;
+  --accent-soft: rgb(99 102 241 / 0.2);
+  --accent-text: #0f172a;
+  background: var(--bg);
+  color: var(--text);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-text: var(--accent-text);
+  --color-danger: var(--danger);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+  --shadow-card: var(--shadow-md);
+  --shadow-soft: var(--shadow-sm);
+  --shadow-pop: var(--shadow-lg);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Chrome autofill paints inputs white/yellow; keep them on-theme. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--text);
+  -webkit-box-shadow: 0 0 0 1000px var(--surface-2) inset;
+  caret-color: var(--text);
+  transition: background-color 9999s ease-out;
+}
+
+dialog::backdrop {
+  background: rgb(5 8 18 / 0.55);
+  backdrop-filter: blur(3px);
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+.animate-toast { animation: toast-in 180ms ease-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-toast { animation: none; }
+}
+
+/* Printing a receipt, transcript or routine prints only that block. */
+@media print {
+  body * { visibility: hidden; }
+  .print-area, .print-area * { visibility: visible; }
+  .print-area { position: absolute; inset: 0; padding: 24px; background: white; color: black; }
+  .no-print { display: none !important; }
+}
